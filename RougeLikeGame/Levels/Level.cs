@@ -57,12 +57,12 @@ public class Level : Scene {
    private void spreadGold()
    {
         var rng = new Random();
-        var hm = rng.Next(10, 20);
+        var hm = rng.Next(10, 20); //This determines how many gold piles exist
 
         for (int i = 0; i < hm; i++)
         {
             var pos = _floor.ElementAt(rng.Next(_floor.Count));
-            _items.Add(new Gold(pos, rng.Next(100, 200)));
+            _items.Add(new Gold(pos, 1));//Each pick up increases gold by 1
         }
    }
 
@@ -78,22 +78,27 @@ public class Level : Scene {
    protected TileSet fovCalc(Vector2 pos, int sens)
       => Vector2.getAllTiles().Where(t => (pos - t).RookLength < sens).ToHashSet();
 
-   // -----------------------------------------------------------------------
-   public override void Update() {
-      
-      updateDiscovered();
-        //is the player standing on an item
+    // -----------------------------------------------------------------------
+    public override void Update()
+    {
+        updateDiscovered();
+
+        // Check if the player is standing on an item
         var item = _items.Find(i => i.Pos == _player!.Pos);
 
         if (item is not null && item is Gold gold)
+        {
             _player!._gold += gold.Amount;
-            
+            //Remove the item from the list so it is no longer updated or drawn
+            _items.Remove(item);
+        }
+
         _player!.Update();
 
-      // foreach item update
-      // foreach NPC update 
-      // check for player death -- on death build RIP message
-   }
+        // foreach item update
+        // foreach NPC update 
+        // check for player death -- on death build RIP message
+    }
 
    public override void Draw(IRenderWindow? disp) {
       // using custom RenderWindow, cast to my RenderWindow
@@ -182,33 +187,36 @@ public class Level : Scene {
 //      }
    }
 
-// ------------------------------------------------------
-// Commands 
-// ------------------------------------------------------
+    // ------------------------------------------------------
+    // Commands 
+    // ------------------------------------------------------
 
 
-   private void registerCommandsWithScene() {
-      RegisterCommand(ConsoleKey.UpArrow, "up");
-      RegisterCommand(ConsoleKey.W, "up");
-      RegisterCommand(ConsoleKey.K, "up");
+    private void registerCommandsWithScene()
+    {
+        RegisterCommand(ConsoleKey.UpArrow, "up");
+        RegisterCommand(ConsoleKey.W, "up");
+        RegisterCommand(ConsoleKey.K, "up");
 
-      RegisterCommand(ConsoleKey.DownArrow, "down");
-      RegisterCommand(ConsoleKey.S, "down");
-      RegisterCommand(ConsoleKey.J, "down");
+        RegisterCommand(ConsoleKey.DownArrow, "down");
+        RegisterCommand(ConsoleKey.S, "down");
+        RegisterCommand(ConsoleKey.J, "down");
 
-      RegisterCommand(ConsoleKey.DownArrow, "left");
-      RegisterCommand(ConsoleKey.A, "left");
-      RegisterCommand(ConsoleKey.H, "left");
+        // Changed DownArrow to LeftArrow here
+        RegisterCommand(ConsoleKey.LeftArrow, "left");
+        RegisterCommand(ConsoleKey.A, "left");
+        RegisterCommand(ConsoleKey.H, "left");
 
-      RegisterCommand(ConsoleKey.DownArrow, "right");
-      RegisterCommand(ConsoleKey.D, "right");
-      RegisterCommand(ConsoleKey.L, "right");
+        // Changed DownArrow to RightArrow here
+        RegisterCommand(ConsoleKey.RightArrow, "right");
+        RegisterCommand(ConsoleKey.D, "right");
+        RegisterCommand(ConsoleKey.L, "right");
 
-      RegisterCommand(ConsoleKey.Q, "quit");
-   }
+        RegisterCommand(ConsoleKey.Q, "quit");
+    }
 
 
-   public void MovePlayer(Vector2 delta) {
+    public void MovePlayer(Vector2 delta) {
       var newPos = _player!.Pos + delta;
 
       if (_walkables.Contains(newPos)) {
