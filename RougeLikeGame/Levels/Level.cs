@@ -87,7 +87,8 @@ public class Level : Scene {
 
         if (item is not null && item is Gold gold)
             _player!._gold += gold.Amount;
-            
+        _items.Remove(item); // Remove the item from the level after picking it up
+
         _player!.Update();
 
       // foreach item update
@@ -182,33 +183,39 @@ public class Level : Scene {
 //      }
    }
 
-// ------------------------------------------------------
-// Commands 
-// ------------------------------------------------------
+    // ------------------------------------------------------
+    // Commands 
+    // ------------------------------------------------------
 
 
-   private void registerCommandsWithScene() {
-      RegisterCommand(ConsoleKey.UpArrow, "up");
-      RegisterCommand(ConsoleKey.W, "up");
-      RegisterCommand(ConsoleKey.K, "up");
+    private void registerCommandsWithScene()
+    {
+        // Movement: Arrow keys
+        RegisterCommand(ConsoleKey.UpArrow, "up");
+        RegisterCommand(ConsoleKey.DownArrow, "down");
+        RegisterCommand(ConsoleKey.LeftArrow, "left");
+        RegisterCommand(ConsoleKey.RightArrow, "right");
 
-      RegisterCommand(ConsoleKey.DownArrow, "down");
-      RegisterCommand(ConsoleKey.S, "down");
-      RegisterCommand(ConsoleKey.J, "down");
+        // Movement: WASD
+        RegisterCommand(ConsoleKey.W, "up");
+        RegisterCommand(ConsoleKey.S, "down");
+        RegisterCommand(ConsoleKey.A, "left");
+        RegisterCommand(ConsoleKey.D, "right");
 
-      RegisterCommand(ConsoleKey.DownArrow, "left");
-      RegisterCommand(ConsoleKey.A, "left");
-      RegisterCommand(ConsoleKey.H, "left");
+        // Movement: Vim keys (HJKL)
+        RegisterCommand(ConsoleKey.K, "up");
+        RegisterCommand(ConsoleKey.J, "down");
+        RegisterCommand(ConsoleKey.H, "left");
+        RegisterCommand(ConsoleKey.L, "right");
 
-      RegisterCommand(ConsoleKey.DownArrow, "right");
-      RegisterCommand(ConsoleKey.D, "right");
-      RegisterCommand(ConsoleKey.L, "right");
-
-      RegisterCommand(ConsoleKey.Q, "quit");
-   }
+        // Quit
+        RegisterCommand(ConsoleKey.Q, "quit");
+    }
 
 
-   public void MovePlayer(Vector2 delta) {
+
+
+    public void MovePlayer(Vector2 delta) {
       var newPos = _player!.Pos + delta;
 
       if (_walkables.Contains(newPos)) {
