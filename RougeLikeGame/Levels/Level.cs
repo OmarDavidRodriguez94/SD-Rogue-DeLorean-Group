@@ -3,6 +3,7 @@ using RogueLib.Engine;
 using RogueLib.Utilities;
 using SandBox01;
 using TileSet = System.Collections.Generic.HashSet<RogueLib.Utilities.Vector2>;
+using RogueLib.Enemies;
 
 namespace RlGameNS;
 
@@ -37,6 +38,7 @@ public class Level : Scene {
    protected TileSet _discovered; // tiles the player has seen
    protected TileSet _inFov;      // current fov of player
    protected List<Item> _items;
+    protected List<Enemy> _enemies;
 
    public Level(Player p, string map, Game game) {
       if (game == null || p == null || map == null)
@@ -47,14 +49,27 @@ public class Level : Scene {
       _map        = map;
       _game       = game;
       _items      = new List<Item>();
+      _enemies = new List<Enemy>();
 
       initMapTileSets(map);
       updateDiscovered();
       registerCommandsWithScene();
       spreadGold();
+      generateEnemies();
    }
 
-   private void spreadGold()
+    private void generateEnemies()
+    {
+        var rng = new Random();
+        var hm = rng.Next(1, 4);
+
+        
+        var pos = _floor.ElementAt(rng.Next(_floor.Count));
+        _enemies.Add(new Goblin(pos));
+        
+    }
+
+    private void spreadGold()
    {
         var rng = new Random();
         var hm = rng.Next(10, 20);
@@ -141,7 +156,14 @@ public class Level : Scene {
         }       
    }
 
-   private void drawEnemies(IRenderWindow disp) { }
+   private void drawEnemies(IRenderWindow disp) 
+   {
+        foreach (var enemy in _enemies)
+        {
+            if (_discovered.Contains(enemy.Pos))
+                disp.Draw(enemy.Glyph, enemy.Pos, ConsoleColor.Red);
+        }
+    }
 
    private void initMapTileSets(string map) {
       var lines = map.Split('\n');
