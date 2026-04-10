@@ -9,7 +9,7 @@ namespace SandBox01;
 public class Gold : Item
 {
     public int Amount { get; init; }
-    public Gold(Vector2 pos, int amt) : base('#', pos) {
+    public Gold(Vector2 pos, int amt) : base('*', pos) {
         Amount = amt;
     }
 

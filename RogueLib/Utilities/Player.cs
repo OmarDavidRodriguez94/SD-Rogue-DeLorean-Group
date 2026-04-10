@@ -8,6 +8,9 @@ public abstract class Player : IActor, IDrawable {
    public char         Glyph => '@';
    public ConsoleColor _color = ConsoleColor.White;
 
+    // New Added The Inventory List 
+    public List<Item> Inventory { get; private set; } = new List<Item>();
+
    protected int _level  = 0;
    protected int _hp     = 12;
    protected int _str    = 16;
@@ -25,10 +28,13 @@ public abstract class Player : IActor, IDrawable {
       Pos  = Vector2.Zero;
    }
 
+    // Displaying the Inventory 
+
    public string HUD =>
       $"Level:{_level}  Gold: {_gold}    Hp: {_hp}({_maxHp})" +
       $"  Str: {_str}({_maxStr})" +
-      $"  Arm: {_arm}   Exp: {_exp}/{10} Turn: {_turn}";
+      $"  Arm: {_arm}   Exp: {_exp}/{10} Turn: {_turn}" + 
+        $" Inv: {Inventory.Count}";
 
 
    public virtual void Update() {

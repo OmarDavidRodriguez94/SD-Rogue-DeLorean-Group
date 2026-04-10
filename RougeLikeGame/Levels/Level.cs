@@ -85,10 +85,23 @@ public class Level : Scene {
         //is the player standing on an item
         var item = _items.Find(i => i.Pos == _player!.Pos);
 
-        if (item is not null && item is Gold gold)
-            _player!._gold += gold.Amount;
-            
+        if (item is not null)
+        {
+            _player!.Inventory.Add(item);
+            _items.Remove(item);
+
+            if (item is Gold gold)
+            {
+                _player!._gold += gold.Amount;
+            }
+
+        }
         _player!.Update();
+
+        //if (item is not null && item is Gold gold)
+        //    _player!._gold += gold.Amount;
+            
+        //_player!.Update();
 
       // foreach item update
       // foreach NPC update 
