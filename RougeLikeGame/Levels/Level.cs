@@ -28,15 +28,14 @@ public class Level : Scene
     protected int _senseRadius = 4;
 
     // --- Tile Sets -----
-    // used to keep track of state of tiles on the map
-    protected TileSet _walkables; // walkable tiles 
+    protected TileSet _walkables;
     protected TileSet _floor;
     protected TileSet _tunnel;
     protected TileSet _door;
-    protected TileSet _decor; // walls and other decorations, always visible once discovered
+    protected TileSet _decor;
 
-    protected TileSet _discovered; // tiles the player has seen
-    protected TileSet _inFov;      // current fov of player
+    protected TileSet _discovered;
+    protected TileSet _inFov;
     protected List<Item> _items;
     private bool _showInventory = false;
 
@@ -46,7 +45,7 @@ public class Level : Scene
             throw new ArgumentNullException("game, player, or map cannot be null");
 
         _player = p;
-        _player.Pos = new Vector2(4, 12); // random, or at stairs
+        _player.Pos = new Vector2(4, 12);
         _map = map;
         _game = game;
         _items = new List<Item>();
@@ -56,14 +55,15 @@ public class Level : Scene
         registerCommandsWithScene();
         spreadGold();
         spreadWeapons();
+        spreadHealingPotions();
     }
 
     private void spreadGold()
     {
         var rng = new Random();
-        var hm = rng.Next(10, 20);
+        int howMany = rng.Next(10, 20);
 
-        for (int i = 0; i < hm; i++)
+        for (int i = 0; i < howMany; i++)
         {
             var pos = _floor.ElementAt(rng.Next(_floor.Count));
             _items.Add(new Gold(pos, rng.Next(100, 200)));
@@ -75,10 +75,26 @@ public class Level : Scene
         var rng = new Random();
         int howMany = rng.Next(2, 5);
 
+        string[] weaponNames = { "Dagger", "Sword", "Axe" };
+        int[] weaponBonuses = { 1, 3, 5 };
+
         for (int i = 0; i < howMany; i++)
         {
             var pos = _floor.ElementAt(rng.Next(_floor.Count));
-            _items.Add(new Weapon("Sword", 3, pos));
+            int index = rng.Next(weaponNames.Length);
+            _items.Add(new Weapon(weaponNames[index], weaponBonuses[index], pos));
+        }
+    }
+
+    private void spreadHealingPotions()
+    {
+        var rng = new Random();
+        int howMany = rng.Next(2, 5);
+
+        for (int i = 0; i < howMany; i++)
+        {
+            var pos = _floor.ElementAt(rng.Next(_floor.Count));
+            _items.Add(new HealingPotion(pos, 5));
         }
     }
 
@@ -93,7 +109,15 @@ public class Level : Scene
     }
 
     protected TileSet fovCalc(Vector2 pos, int sens)
-        => Vector2.getAllTiles().Where(t => (pos - t).RookLength < sens).ToHashSet();
+    {
+        var validMapTiles = _walkables
+            .Union(_decor)
+            .ToHashSet();
+
+        return validMapTiles
+            .Where(t => (pos - t).RookLength < sens)
+            .ToHashSet();
+    }
 
     // -----------------------------------------------------------------------
     public override void Update()
@@ -112,15 +136,41 @@ public class Level : Scene
             _player!.Inventory.AddWeapon(weapon);
             _items.Remove(item);
         }
+        else if (item is HealingPotion potion)
+        {
+            _player!.Inventory.AddHealingPotion();
+            _items.Remove(item);
+        }
 
         _player!.Update();
     }
 
     public override void Draw(IRenderWindow? disp)
     {
-        var tilesToDraw = new TileSet(_decor);
-        tilesToDraw.IntersectWith(_discovered);
-        tilesToDraw.UnionWith(_inFov);
+        for (int y = 0; y < 25; y++)
+        {
+            disp.Draw(new string(' ', 78), new Vector2(0, y), ConsoleColor.White);
+        }
+
+        if (_showInventory)
+        {
+            disp.Draw("=== INVENTORY ===", new Vector2(2, 2), ConsoleColor.White);
+            disp.Draw(_player.Inventory.GetDisplayText(_player), new Vector2(2, 4), ConsoleColor.White);
+            disp.Draw("Press I to return to the map", new Vector2(2, 16), ConsoleColor.DarkGray);
+            return;
+        }
+
+        var discoveredWalkables = _walkables
+            .Intersect(_discovered)
+            .ToHashSet();
+
+        var discoveredDecor = _decor
+            .Intersect(_discovered)
+            .ToHashSet();
+
+        var tilesToDraw = discoveredWalkables
+            .Union(discoveredDecor)
+            .ToHashSet();
 
         disp.fDraw(tilesToDraw, _map, ConsoleColor.Gray);
 
@@ -134,15 +184,21 @@ public class Level : Scene
 
         drawEnemies(disp);
         disp.Draw(_player.HUD, new Vector2(0, 24), ConsoleColor.Green);
-
-        if (_showInventory)
-        {
-            disp.Draw(_player.Inventory.GetDisplayText(_player), new Vector2(48, 2), ConsoleColor.White);
-        }
     }
 
     public override void DoCommand(Command command)
     {
+        if (command.Name == "inventory")
+        {
+            _showInventory = !_showInventory;
+            return;
+        }
+
+        if (_showInventory)
+        {
+            return;
+        }
+
         if (command.Name == "up")
         {
             MovePlayer(Vector2.N);
@@ -159,23 +215,17 @@ public class Level : Scene
         {
             MovePlayer(Vector2.E);
         }
-        else if (command.Name == "inventory")
-        {
-            _showInventory = !_showInventory;
-        }
         else if (command.Name == "quit")
         {
             _levelActive = false;
         }
     }
 
-    // -------------------------------------------------------------------------
-
     private void drawItems(IRenderWindow disp)
     {
         foreach (var item in _items)
         {
-            if (_inFov.Contains(item.Pos))
+            if (_discovered.Contains(item.Pos))
                 item.Draw(disp);
         }
     }
@@ -184,15 +234,6 @@ public class Level : Scene
 
     private void initMapTileSets(string map)
     {
-        // ------ rules for map ------
-        // . - floor, walkable and transparent.
-        // + - door, walkable and transparent
-        // # - tunnel, walkable and transparent
-        // ' ' - solid stone, not walkable, not transparent.
-        // '|' - wall, not walkable, not transparent, but discoverable.
-        // others are treated the same as wall.
-        // tunnel, wall, and doorways are decor, once discovered they are visible.
-
         _floor = new TileSet();
         _tunnel = new TileSet();
         _door = new TileSet();
@@ -208,10 +249,6 @@ public class Level : Scene
 
         _walkables = _floor.Union(_tunnel).Union(_door).ToHashSet();
     }
-
-    // ------------------------------------------------------
-    // Commands 
-    // ------------------------------------------------------
 
     private void registerCommandsWithScene()
     {
@@ -243,8 +280,8 @@ public class Level : Scene
         {
             var oldPos = _player!.Pos;
             _player.Pos = newPos;
-            _walkables.Remove(newPos); // new tile is now occupied
-            _walkables.Add(oldPos);    // old tile is now free
+            _walkables.Remove(newPos);
+            _walkables.Add(oldPos);
         }
     }
 
