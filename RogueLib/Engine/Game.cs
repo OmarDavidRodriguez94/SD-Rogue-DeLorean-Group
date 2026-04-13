@@ -56,4 +56,10 @@ public class Game {
       if (_currentLevel!.HasCommand(key.Key))
          _currentLevel!.DoCommand(new Command(_currentLevel!.GetCommand(key.Key)));
    }
+
+    // Add method for level porpose
+    public void SetLevel(Scene level)
+    {
+        _currentLevel = level;
+    }
 }

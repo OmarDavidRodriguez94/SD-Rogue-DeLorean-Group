@@ -30,11 +30,12 @@ public abstract class Player : IActor, IDrawable {
 
     // Displaying the Inventory 
 
-   public string HUD =>
-      $"Level:{_level}  Gold: {_gold}    Hp: {_hp}({_maxHp})" +
-      $"  Str: {_str}({_maxStr})" +
-      $"  Arm: {_arm}   Exp: {_exp}/{10} Turn: {_turn}" + 
-        $" Inv: {Inventory.Count}";
+    public string HUD =>
+       $"Level:{_level}  Gold: {_gold}  Hp: {_hp}({_maxHp})" +
+          $"  Inv: {Inventory.Count}" +
+       $"  Str: {_str}({_maxStr})" +
+       $"  Arm: {_arm}   Exp: {_exp}/{10} Turn: {_turn}"; 
+      //$"  Inv: {Inventory.Count}";
 
 
    public virtual void Update() {
@@ -44,4 +45,10 @@ public abstract class Player : IActor, IDrawable {
    public virtual void Draw(IRenderWindow disp) {
       disp.Draw(Glyph, Pos, _color);
    }
+
+    // Add to Inventary Method here
+    //public virtual void AddInventory(item)
+    //{
+
+    //}
 }

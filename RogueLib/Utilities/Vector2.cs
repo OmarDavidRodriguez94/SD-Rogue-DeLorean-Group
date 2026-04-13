@@ -11,7 +11,7 @@ public struct Vector2 : IEquatable<Vector2>, IComparable<Vector2> {
 
    public Vector2(int x, int y) => (X, Y) = (x, y);
    public Vector2() : this(0, 0) { }
-
+    
    // predefined vectors
    public static readonly Vector2 Zero = new Vector2(0, 0);
    public static readonly Vector2 One  = new Vector2(1, 1);

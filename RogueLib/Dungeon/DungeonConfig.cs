@@ -52,6 +52,7 @@ public static class DungeonConfig {
              ###############
       """;
 
+    // need to get user name so we can display it.
   static string RIP =
       """
 
