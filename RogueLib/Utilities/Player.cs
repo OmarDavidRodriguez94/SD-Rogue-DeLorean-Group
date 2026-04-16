@@ -1,7 +1,8 @@
 using RogueLib.Dungeon;
+using RogueLib.Interfaces;
 using RogueLib.Utilities;
 
-public abstract class Player : IActor, IDrawable {
+public abstract class Player : IActor, IDrawable, IDamageable {
    public string       Name { get; set; }
    public Vector2      Pos;
    public int Gold {  get; set; }
@@ -9,7 +10,7 @@ public abstract class Player : IActor, IDrawable {
    public ConsoleColor _color = ConsoleColor.White;
 
    protected int _level  = 0;
-   public int HP { get; private set; }  = 12;
+   protected int _hp  = 12;
    protected int _str    = 16;
    protected int _arm    = 4;
    protected int _exp    = 0;
@@ -17,6 +18,7 @@ public abstract class Player : IActor, IDrawable {
    protected int _maxHp  = 12;
    protected int _maxStr = 16;
    protected int _turn   = 0;
+   protected int _attackPower = 4;
    
    public int Turn => _turn;
 
@@ -26,7 +28,7 @@ public abstract class Player : IActor, IDrawable {
    }
 
    public string HUD =>
-      $"Level:{_level}  Gold: {_gold}    Hp: {HP}({_maxHp})" +
+      $"Level:{_level}  Gold: {_gold}    Hp: {_hp}({_maxHp})" +
       $"  Str: {_str}({_maxStr})" +
       $"  Arm: {_arm}   Exp: {_exp}/{10} Turn: {_turn}";
 
@@ -37,6 +39,16 @@ public abstract class Player : IActor, IDrawable {
 
    public virtual void Draw(IRenderWindow disp) {
       disp.Draw(Glyph, Pos, _color);
+   }
+
+   public int Attack()
+   {
+      return _attackPower;
+   }
+
+   public void TakeDamage(int damage)
+   {
+      _hp -= damage;
    }
 
 

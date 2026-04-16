@@ -10,7 +10,7 @@ public abstract class Enemy : IDrawable, IDamageable
 {
    public Vector2 Pos { get; set; }
    public char Glyph { get; init; }
-   public int Health 
+   protected int Health 
    { 
       get => field;
       set
@@ -27,6 +27,19 @@ public abstract class Enemy : IDrawable, IDamageable
    }
 
    public string Name { get; init; }
+
+   private bool isAlive = true;
+   public bool IsAlive
+   {
+      get => isAlive;
+      set
+      {
+         if(Health == 0)
+         {
+            isAlive = false;
+         }
+      }
+   }
 
    public Enemy(char c, Vector2 pos, string name)
    {
