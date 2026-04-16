@@ -7,16 +7,20 @@ namespace RogueLib.Dungeon;
 
 public abstract class Enemy : IDrawable
 {
-    public Vector2 Pos { get; set; }
-    public char Glyph { get; init; }
+   public Vector2 Pos { get; set; }
+   public char Glyph { get; init; }
 
-    public string Name { get; init; }
+   public int Health { get; set; } = 12;
 
-    public Enemy(char c, Vector2 pos, string name)
-    {
-        Glyph = c;
-        Pos = pos;
-        Name = name;
-    }
-    public abstract void Draw(IRenderWindow disp);
+   public string Name { get; init; }
+
+   public Enemy(char c, Vector2 pos, string name)
+   {
+      Glyph = c;
+      Pos = pos;
+      Name = name;
+   }
+   public abstract void Draw(IRenderWindow disp);
+
+   
 }

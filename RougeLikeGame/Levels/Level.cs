@@ -39,10 +39,7 @@ public class Level : Scene {
    protected TileSet _discovered; // tiles the player has seen
    protected TileSet _inFov;      // current fov of player
    protected List<Item> _items;
-    protected List<Enemy> _enemies;
-
-   // --- Notification System ---
-   protected string? _message;
+   protected List<Enemy> _enemies;
 
    public Level(Player p, string map, Game game) {
       if (game == null || p == null || map == null)
@@ -54,6 +51,7 @@ public class Level : Scene {
       _game       = game;
       _items      = new List<Item>();
       _enemies = new List<Enemy>();
+      _message = "";
 
       initMapTileSets(map);
       updateDiscovered();
@@ -132,9 +130,11 @@ public class Level : Scene {
 
       drawEnemies(disp);
       disp.Draw(_player.HUD, new Vector2(0, 24), ConsoleColor.Green);
+
    }
 
    public override void DoCommand(Command command) {
+      
       // player ctl  
       if (command.Name == "up") {
          MovePlayer(Vector2.N);
@@ -237,12 +237,12 @@ public class Level : Scene {
 
    public void MovePlayer(Vector2 delta) {
       var newPos = _player!.Pos + delta;
-
+      
       foreach (var enemy in _enemies)
       {
          if (newPos == enemy.Pos)
          {
-            Notification("Player attacked the enemy");
+            
          }
          else if (_walkables.Contains(newPos))
          {
@@ -260,13 +260,4 @@ public class Level : Scene {
       _levelActive = false;
    }
 
-   private void Notification(string msg)
-   {
-      Console.WriteLine(msg);
-   }
-
-   private void ClearNotif()
-   {
-      _message = "";
-   }
 }
