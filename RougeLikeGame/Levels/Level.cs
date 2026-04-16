@@ -4,6 +4,7 @@ using RogueLib.Utilities;
 using SandBox01;
 using TileSet = System.Collections.Generic.HashSet<RogueLib.Utilities.Vector2>;
 using RogueLib.Enemies;
+using Microsoft.VisualBasic;
 
 namespace RlGameNS;
 
@@ -39,6 +40,9 @@ public class Level : Scene {
    protected TileSet _inFov;      // current fov of player
    protected List<Item> _items;
     protected List<Enemy> _enemies;
+
+   // --- Notification System ---
+   protected string? _message;
 
    public Level(Player p, string map, Game game) {
       if (game == null || p == null || map == null)
@@ -144,6 +148,7 @@ public class Level : Scene {
       else if (command.Name == "quit") {
          _levelActive = false;
       }
+      
    }
 
 // -------------------------------------------------------------------------
@@ -218,11 +223,11 @@ public class Level : Scene {
       RegisterCommand(ConsoleKey.S, "down");
       RegisterCommand(ConsoleKey.J, "down");
 
-      RegisterCommand(ConsoleKey.DownArrow, "left");
+      RegisterCommand(ConsoleKey.LeftArrow, "left");
       RegisterCommand(ConsoleKey.A, "left");
       RegisterCommand(ConsoleKey.H, "left");
 
-      RegisterCommand(ConsoleKey.DownArrow, "right");
+      RegisterCommand(ConsoleKey.RightArrow, "right");
       RegisterCommand(ConsoleKey.D, "right");
       RegisterCommand(ConsoleKey.L, "right");
 
@@ -233,15 +238,35 @@ public class Level : Scene {
    public void MovePlayer(Vector2 delta) {
       var newPos = _player!.Pos + delta;
 
-      if (_walkables.Contains(newPos)) {
-         var oldPos = _player!.Pos;
-         _player!.Pos = newPos;
-         _walkables.Remove(newPos); // new tile is now occupied
-         _walkables.Add(oldPos);    // old tile is now free
+      foreach (var enemy in _enemies)
+      {
+         if (newPos == enemy.Pos)
+         {
+            Notification("Player attacked the enemy");
+         }
+         else if (_walkables.Contains(newPos))
+         {
+            var oldPos = _player!.Pos;
+            _player!.Pos = newPos;
+            _walkables.Remove(newPos); // new tile is now occupied
+            _walkables.Add(oldPos);    // old tile is now free
+         }
       }
+
+      
    }
 
    public void QuitLevel() {
       _levelActive = false;
+   }
+
+   private void Notification(string msg)
+   {
+      Console.WriteLine(msg);
+   }
+
+   private void ClearNotif()
+   {
+      _message = "";
    }
 }
