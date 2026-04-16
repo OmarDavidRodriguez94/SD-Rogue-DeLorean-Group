@@ -41,6 +41,7 @@ public abstract class Player : IActor, IDrawable {
       disp.Draw(Glyph, Pos, _color);
    }
     // Author: Joshua Watson
+    // A list of messages to display to the player, along with their corresponding colors
     public List<string> Messages { get; private set; } = new();
     public List<ConsoleColor> MessageColors = new();
 
