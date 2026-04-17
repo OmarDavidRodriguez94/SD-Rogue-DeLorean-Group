@@ -19,6 +19,7 @@ public abstract class Player : IActor, IDrawable, IDamageable {
    protected int _maxStr = 16;
    protected int _turn   = 0;
    protected int _attackPower = 4;
+   protected bool _isAlive = true;
    
    public int Turn => _turn;
 

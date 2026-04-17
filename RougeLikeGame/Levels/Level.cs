@@ -120,6 +120,7 @@ public class Level : Scene {
       disp.fDraw(tilesToDraw, _map, ConsoleColor.Gray);
 
       drawItems(disp);
+      drawEnemies(disp);
 
       var rng = new Random();
       if (_player.Turn % 5 == 0)
@@ -127,7 +128,7 @@ public class Level : Scene {
       _player!.Draw(disp);
       // disp.Draw(_player!.Glyph, _player!.Pos, ConsoleColor.Cyan);
 
-      drawEnemies(disp);
+      
       disp.Draw(_player.HUD, new Vector2(0, 24), ConsoleColor.Green);
 
    }
@@ -166,8 +167,11 @@ public class Level : Scene {
         {
             if (_discovered.Contains(enemy.Pos))
                 disp.Draw(enemy.Glyph, enemy.Pos, ConsoleColor.Red);
-        }
-    }
+            if(enemy.IsAlive == false)
+            disp.Draw(enemy.Glyph, enemy.Pos, ConsoleColor.White);
+      }
+
+   }
 
    private void initMapTileSets(string map) {
       var lines = map.Split('\n');
@@ -239,9 +243,17 @@ public class Level : Scene {
       
       foreach (var enemy in _enemies)
       {
-         if (newPos == enemy.Pos)
+         if (newPos == enemy.Pos && enemy.IsAlive)
          {
-            
+            enemy.TakeDamage(_player.Attack());
+            //if (enemy.IsAlive)
+            //{
+            //   _player.TakeDamage(enemy.Attack());
+            //}
+            if(enemy.Health == 0)
+            {
+               enemy.IsAlive = false;
+            }
          }
          else if (_walkables.Contains(newPos))
          {
@@ -249,10 +261,9 @@ public class Level : Scene {
             _player!.Pos = newPos;
             _walkables.Remove(newPos); // new tile is now occupied
             _walkables.Add(oldPos);    // old tile is now free
-         }
+         }         
       }
 
-      
    }
 
    public void QuitLevel() {
