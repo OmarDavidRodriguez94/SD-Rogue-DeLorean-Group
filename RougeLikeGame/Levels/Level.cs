@@ -284,17 +284,21 @@ public class Level : Scene
        Switching Level Method  
      */
 
-    private void GoToNextLevel()
-    {
-        string nextMap;
+     private void GoToNextLevel()
+ {
+     string nextMap;
 
-        if (_map == MyGame.map1)
-            nextMap = MyGame.map2;
-        else
-            nextMap = MyGame.map1;
+     if (_map == MyGame.map1)
+         nextMap = MyGame.map2;
+     else if (_map == MyGame.map2)
+         nextMap = MyGame.map3;
+     else
+         nextMap = MyGame.map1;
 
-        _game!.SetLevel(new Level(_player!, nextMap, _game!));
+     var nextLevel = new Level(_player!, nextMap, _game!);
 
-        _levelActive = false;
-    }
+     _game!.SetLevel(nextLevel);
+     _levelActive = false;
+     return;
+ }
 }
