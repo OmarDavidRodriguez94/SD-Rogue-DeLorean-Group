@@ -1,8 +1,9 @@
 using RogueLib.Dungeon;
+using RogueLib.Interfaces;
 using RogueLib.Utilities;
 using System.Drawing;
 
-public abstract class Player : IActor, IDrawable
+public abstract class Player : IActor, IDrawable, IDamageable
 {
     public string Name { get; set; }
     public Vector2 Pos;
@@ -22,8 +23,10 @@ public abstract class Player : IActor, IDrawable
     protected int _maxHp = 12;
     protected int _maxStr = 16;
     protected int _turn = 0;
+    protected int _attackPower = 4;
+    protected bool _isAlive = true;
 
-    public int Turn => _turn;
+   public int Turn => _turn;
 
     // Strength total agora inclui bonus acumulado das weapons
     public int TotalStrength => _str + Inventory.GetWeaponBonus();
@@ -50,6 +53,7 @@ public abstract class Player : IActor, IDrawable
    public virtual void Draw(IRenderWindow disp) {
       disp.Draw(Glyph, Pos, _color);
    }
+
     // Author: Joshua Watson
     // A list of messages to display to the player, along with their corresponding colors
     public List<string> Messages { get; private set; } = new();
@@ -68,4 +72,21 @@ public abstract class Player : IActor, IDrawable
             MessageColors.RemoveAt(0);
         }
     }
+
+   public int Attack()
+   {
+      return _attackPower;
+   }
+
+   public void TakeDamage(int damage)
+   {
+      _hp -= damage;
+      if (_hp == 0)
+      {
+         Console.Clear();
+         Console.WriteLine("Game Over");
+         return;
+      }
+   }
+
 }
