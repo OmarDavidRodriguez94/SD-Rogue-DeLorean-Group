@@ -287,6 +287,23 @@ public class Level : Scene {
             return;
         }
 
+        //consume the potion and log the result to the screen
+        if (command.Name == "heal")
+        {
+            if (_player!.Inventory.UseHealingPotion())
+            {
+                const int healAmount = 25; // Define a standard healing amount
+                _player.Heal(healAmount);
+                Log($"You drink a healing potion and restore {healAmount} HP!");
+            }
+            else
+            {
+                Log("You don't have any healing potions!");
+            }
+            return;
+        }
+
+
         // Prevent movement while the menu is open
         if (_showInventory) return;
 
@@ -385,6 +402,8 @@ public class Level : Scene {
 
         // 'I' key to the "inventory" command
         RegisterCommand(ConsoleKey.I, "inventory");
+
+        RegisterCommand(ConsoleKey.E, "heal"); // Press 'E' to drink
 
         RegisterCommand(ConsoleKey.Q, "quit");
     }

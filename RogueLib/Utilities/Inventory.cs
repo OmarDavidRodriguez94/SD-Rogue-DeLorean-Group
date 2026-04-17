@@ -20,6 +20,16 @@ public class Inventory
         _healingPotions++;
     }
 
+    public bool UseHealingPotion()
+    {
+        if (_healingPotions > 0)
+        {
+            _healingPotions--;
+            return true;
+        }
+        return false;
+    }
+
     public int GetWeaponBonus()
     {
         return _weaponBonus;

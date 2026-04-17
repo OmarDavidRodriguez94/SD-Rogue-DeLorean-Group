@@ -71,4 +71,9 @@ public abstract class Player : IActor, IDrawable {
    public virtual void Draw(IRenderWindow disp) {
       disp.Draw(Glyph, Pos, _color);
    }
+
+    public virtual void Heal(int amount)
+    {
+        _hp = Math.Min(_maxHp, _hp + amount);
+    }
 }
