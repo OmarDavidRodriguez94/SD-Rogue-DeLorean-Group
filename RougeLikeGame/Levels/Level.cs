@@ -162,7 +162,21 @@ public class Level : Scene
             _player.AddMessage(
                 $"You pick up a small pile of {gold.Amount} gold.", ConsoleColor.DarkYellow);
          }
+      }
+      else if (item is Weapon weapon)
+      {
 
+         _player!.Inventory.AddWeapon(weapon);
+
+         _items.Remove(item);
+
+      }
+      else if (item is HealingPotion potion)
+      {
+
+         _player!.Inventory.AddHealingPotion();
+
+         _items.Remove(item);
 
       }
 
