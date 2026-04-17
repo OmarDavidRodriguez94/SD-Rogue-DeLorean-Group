@@ -227,18 +227,18 @@ public class Level : Scene {
 
     public override void Draw(IRenderWindow? disp)
     {
-        // NEW: Draw the Inventory overlay if active
+        // FIX: Clear the entire buffer at the start of every frame
+        // This prevents old screens (like the inventory) from "sticking"
+        for (int y = 0; y < 25; y++)
+        {
+            disp.Draw(new string(' ', 78), new Vector2(0, y), ConsoleColor.Black);
+        }
+
         if (_showInventory)
         {
-            // Clear screen with empty spaces
-            for (int y = 0; y < 25; y++)
-            {
-                disp.Draw(new string(' ', 78), new Vector2(0, y), ConsoleColor.Black);
-            }
-
+            // We no longer need the clear loop here because it's done above
             disp.Draw("=== INVENTORY ===", new Vector2(2, 2), ConsoleColor.White);
 
-            // Draw inventory line by line safely
             var lines = _player.Inventory.GetDisplayText(_player).Split('\n');
             for (int i = 0; i < lines.Length; i++)
             {
@@ -246,11 +246,11 @@ public class Level : Scene {
             }
 
             disp.Draw("Press 'I' to return to the map", new Vector2(2, 22), ConsoleColor.DarkGray);
-            return; // Skip drawing the dungeon
+            return;
         }
 
         // using custom RenderWindow, cast to my RenderWindow
-        var tilesToDraw = new TileSet(_decor);
+        var tilesToDraw = new TileSet(_discovered);
         tilesToDraw.IntersectWith(_discovered);
         tilesToDraw.UnionWith(_inFov);
 
