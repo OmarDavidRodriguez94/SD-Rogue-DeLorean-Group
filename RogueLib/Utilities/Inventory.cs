@@ -19,6 +19,17 @@ public class Inventory
         _healingPotions++;
     }
 
+    public bool UseHealingPotion()
+    {
+        if (_healingPotions > 0)
+        {
+            _healingPotions--;
+            return true;
+        }
+
+        return false;
+    }
+
     public int GetWeaponBonus()
     {
         return _weaponBonus;
@@ -55,6 +66,10 @@ public class Inventory
         sb.AppendLine($"Healing Potions: {_healingPotions}");
         sb.AppendLine();
         sb.AppendLine($"Weapon Strength Bonus: +{_weaponBonus}");
+        sb.AppendLine();
+        sb.AppendLine("Commands:");
+        sb.AppendLine("- P = Use Healing Potion");
+        sb.AppendLine("- I = Close Inventory");
 
         return sb.ToString();
     }

@@ -38,6 +38,7 @@ public class Level : Scene
     protected TileSet _inFov;
     protected List<Item> _items;
     private bool _showInventory = false;
+    private string _inventoryMessage = "";
 
     public Level(Player p, string map, Game game)
     {
@@ -156,7 +157,13 @@ public class Level : Scene
         {
             disp.Draw("=== INVENTORY ===", new Vector2(2, 2), ConsoleColor.White);
             disp.Draw(_player.Inventory.GetDisplayText(_player), new Vector2(2, 4), ConsoleColor.White);
-            disp.Draw("Press I to return to the map", new Vector2(2, 16), ConsoleColor.DarkGray);
+
+            if (!string.IsNullOrEmpty(_inventoryMessage))
+            {
+                disp.Draw(_inventoryMessage, new Vector2(2, 18), ConsoleColor.Yellow);
+            }
+
+            disp.Draw("Press I to return to the map", new Vector2(2, 20), ConsoleColor.DarkGray);
             return;
         }
 
@@ -191,11 +198,24 @@ public class Level : Scene
         if (command.Name == "inventory")
         {
             _showInventory = !_showInventory;
+            _inventoryMessage = "";
             return;
         }
 
         if (_showInventory)
         {
+            if (command.Name == "use_healing_potion")
+            {
+                if (_player!.UseHealingPotion())
+                {
+                    _inventoryMessage = "Healing potion used!";
+                }
+                else
+                {
+                    _inventoryMessage = "No healing potions available.";
+                }
+            }
+
             return;
         }
 
@@ -269,6 +289,7 @@ public class Level : Scene
         RegisterCommand(ConsoleKey.L, "right");
 
         RegisterCommand(ConsoleKey.I, "inventory");
+        RegisterCommand(ConsoleKey.P, "use_healing_potion");
         RegisterCommand(ConsoleKey.Q, "quit");
     }
 

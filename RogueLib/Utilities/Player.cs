@@ -24,7 +24,6 @@ public abstract class Player : IActor, IDrawable
 
     public int Turn => _turn;
 
-    // Strength total agora inclui bonus acumulado das weapons
     public int TotalStrength => _str + Inventory.GetWeaponBonus();
 
     public Player()
@@ -41,6 +40,27 @@ public abstract class Player : IActor, IDrawable
         $"  Arm: {_arm}" +
         $"   Exp: {_exp}/10" +
         $"   Turn: {_turn}";
+
+    public void Heal(int amount)
+    {
+        _hp += amount;
+
+        if (_hp > _maxHp)
+        {
+            _hp = _maxHp;
+        }
+    }
+
+    public bool UseHealingPotion()
+    {
+        if (Inventory.UseHealingPotion())
+        {
+            Heal(5);
+            return true;
+        }
+
+        return false;
+    }
 
     public virtual void Update()
     {
